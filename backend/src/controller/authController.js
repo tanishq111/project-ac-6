@@ -28,6 +28,14 @@ const register = async (req, res) => {
     res.status(201).json({ message: "User registered successfully" });
 };
 
+const parseUser = (user) => {
+    return {
+        id: user._id,
+        email: user.email,
+        username: user.username
+    };
+};
+
 
 const login = async (req, res) => { // after successfull login i need to return jwt from here
    const { email, password } = req.body;
@@ -39,7 +47,7 @@ const login = async (req, res) => { // after successfull login i need to return 
    if (!isMatch) {
        return res.status(400).json({ message: "Invalid email or password" });
    }
-   res.status(200).json({ message: "Login successful" , ...generateToken({ user }) });
+   res.status(200).json({ userData: parseUser(user), message: "Login successful" , ...generateToken({ user }) });
 };
 
 const refreshToken = async (req, res) => {

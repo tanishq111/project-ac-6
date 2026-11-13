@@ -1,0 +1,1 @@
+# 1. Even after getting logged out name was still coming in the navbar

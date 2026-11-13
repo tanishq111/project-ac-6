@@ -1,16 +1,34 @@
 import { Navigate, useNavigate } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../context/AuthContext.jsx";
+import socket from "../api/socket.js";
 
 const Home = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const { isLoggedIn, userName, logout } = useContext(AuthContext);
 
-  if (!token) { // this is the proof of identity check
+  if (!isLoggedIn) { // this is the proof of identity check
     return <Navigate to="/login" replace />;
   }
 
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connected to socket server:", socket.id);
+    });
+
+    return () => {
+      socket.off("connect");
+    };
+  }, []);
+
+
+  socket.on("message", (data) => {
+    console.log("Received message from server:", data);
+  });
+
+
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
+    logout();
     navigate("/login", { replace: true });
   }
 
@@ -22,9 +40,19 @@ const Home = () => {
       <h2>Your Dashboard</h2>
       <p>You have 3 tasks waiting and 2 tasks completed today.</p>
 
+    {isLoggedIn && (
+      <p>Welcome, {userName}!</p>
+    )}
+    {isLoggedIn && (
       <button type="button" onClick={handleLogout}>
         Log out
       </button>
+    )}
+
+    <button type="button" onClick={() => socket.emit("sendMessage", "Hello from client!")}>
+        Send Message
+      </button>
+
     </section>
   );
 };

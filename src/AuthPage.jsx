@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext.jsx";
 import api from "./api/api.js";
 
 export default function AuthPage({ mode = "login" }) {
@@ -13,6 +15,7 @@ export default function AuthPage({ mode = "login" }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isLoggedIn, setIsLoggedIn, login, logout } = useContext(AuthContext);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -43,19 +46,8 @@ export default function AuthPage({ mode = "login" }) {
           state: { notice: "Account created. Sign in to continue." },
         });
       } else {
-        const { data } = await api.post("/api/auth/login", {
-          email: email.trim(),
-          password,
-        });
-
-        if (typeof data.token !== "string" || !data.token.trim() ||
-          typeof data.refreshToken !== "string" || !data.refreshToken.trim()) {
-          setError("The server did not return login tokens. Please try again.");
-          return;
-        }
-
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("refreshToken", data.refreshToken);
+        await login(email.trim(), password);
+        setIsLoggedIn(true);
         navigate("/home", { replace: true });
       }
     } catch (requestError) {

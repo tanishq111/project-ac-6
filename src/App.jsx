@@ -7,6 +7,9 @@ import PeoplePage from "./PeoplePage.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Home from "./pages/home.jsx";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext.jsx";
+
 
 const NotFoundPage = () => {
   return (
@@ -18,6 +21,8 @@ const NotFoundPage = () => {
 }
 
 export default function App() {
+  const { isLoggedIn } = useContext(AuthContext);
+  console.log("testtt",isLoggedIn);
   return (
     <TaskProvider>
       <Routes>
@@ -25,8 +30,8 @@ export default function App() {
           <Route index element={<TasksPage />} />
           <Route path="people" element={<PeoplePage />} />
           <Route path="home" element={<Home />} />
-          <Route path="login" element={<Login />} />
-          <Route path="signup" element={<Signup />} />
+        <Route path="login" element={ isLoggedIn ? <Home /> : <Login />} />
+          <Route path="signup" element={isLoggedIn ? <Home /> : <Signup />} />
           <Route path="tasks/:taskId" element={<TaskDetailPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

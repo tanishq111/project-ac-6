@@ -1,5 +1,5 @@
 import axios from "axios";
-
+// helping the client communicate with the backend API (expressAPI)
 const api = axios.create({
   baseURL: "http://127.0.0.1:3000",
   headers: {
